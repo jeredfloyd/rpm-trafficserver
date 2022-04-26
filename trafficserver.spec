@@ -4,7 +4,7 @@
 
 Name:           trafficserver
 Version:        9.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Fast, scalable and extensible HTTP/1.1 and HTTP/2 caching proxy server
 
 License:        ASL 2.0
@@ -307,7 +307,10 @@ fi
 
 
 %changelog
-* Thu Apr 18 2022 Jered Floyd <jered@redhat.com> 9.1.2-2
+* Mon Apr 25 2022 Jered Floyd <jered@redhat.com> 9.1.2-3
+- Allow self:process setsched, requested on EL8
+
+* Mon Apr 18 2022 Jered Floyd <jered@redhat.com> 9.1.2-2
 - Set SELinux policy to be more restrictive on privileged UDP ports
 
 * Thu Apr 07 2022 Jered Floyd <jered@redhat.com> 9.1.2-1

@@ -48,7 +48,7 @@ systemd_unit_file(trafficserver_unit_file_t)
 # so this permission is not required and should not be granted!
 # allow trafficserver_t self:capability { setgid setuid };
 
-allow trafficserver_t self:process { execmem fork setcap setrlimit signal_perms };
+allow trafficserver_t self:process { execmem fork setcap setrlimit signal_perms setsched };
 allow trafficserver_t self:fifo_file rw_fifo_file_perms;
 allow trafficserver_t self:tcp_socket create_stream_socket_perms;
 allow trafficserver_t self:unix_stream_socket { create_stream_socket_perms connectto };
