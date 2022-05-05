@@ -4,7 +4,7 @@
 
 Name:           trafficserver
 Version:        9.1.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Fast, scalable and extensible HTTP/1.1 and HTTP/2 caching proxy server
 
 License:        ASL 2.0
@@ -33,6 +33,7 @@ Patch2:         gcc12-cstring.patch
 # Upstream PR: https://github.com/apache/trafficserver/pull/8468 
 Patch3:         string-index-oob.patch
 # Define standard config layout for Fedora/RHEL systems
+# Upstream PR: https://github.com/apache/trafficserver/pull/8815
 Patch4:         config-layout-redhat.patch
 
 # Upstream does not support 32-bit architectures:
@@ -45,7 +46,7 @@ BuildRequires:  gcc gcc-c++ perl-ExtUtils-MakeMaker
 BuildRequires:  libcap-devel
 BuildRequires:  systemd-rpm-macros
 # trafficserver does not work properly with OpenSSL 3.0.2 yet
-# Upstream issue: https://github.com/apache/trafficserver/issues/7341
+# Upstream Issue: https://github.com/apache/trafficserver/issues/7341
 %if 0%{?fedora} >= 36
 BuildRequires:  openssl1.1-devel
 %else
@@ -150,8 +151,11 @@ cp %{SOURCE3} tests/include/
 source /opt/rh/devtoolset-8/enable
 %endif
 
+# Strange libexecdir is because upstream puts plugins in libexec, which isn't
+# right since they are libraries and not helper applications.
+# Upstream Issue: https://github.com/apache/trafficserver/issues/8823
 %configure \
-  --enable-layout=Redhat \
+  --enable-layout=RedHat \
   --sysconfdir=%{_sysconfdir}/%{name} \
   --libdir=%{_libdir}/%{name} \
   --libexecdir=%{_libdir}/%{name}/plugins \
@@ -309,6 +313,10 @@ fi
 
 
 %changelog
+* Thu May 5 2022 Jered Floyd <jered@redhat.com> 9.1.2-5
+- Changes based on spec review; change "RedHat" capitalization,
+  and add link to upstream file layout discussion
+
 * Mon May 2 2022 Jered Floyd <jered@redhat.com> 9.1.2-4
 - Changes based on spec review
 
