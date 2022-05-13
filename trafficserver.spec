@@ -319,7 +319,7 @@ fi
 * Thu May 12 2022 Jered Floyd <jered@redhat.com> 9.1.2-6
 - Further changes based on package review; perl dependencies, paths
 
-  * Thu May 5 2022 Jered Floyd <jered@redhat.com> 9.1.2-5
+* Thu May 5 2022 Jered Floyd <jered@redhat.com> 9.1.2-5
 - Changes based on spec review; change "RedHat" capitalization,
   and add link to upstream file layout discussion
 
