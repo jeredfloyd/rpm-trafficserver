@@ -4,7 +4,7 @@
 
 Name:           trafficserver
 Version:        9.1.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Fast, scalable and extensible HTTP/1.1 and HTTP/2 caching proxy server
 
 License:        ASL 2.0
@@ -120,7 +120,8 @@ Trafficserver SELinux policy module
 
 %package devel
 Summary: Development files for Apache Traffic Server plugins
-Requires: %{name} = %{version}-%{release}
+BuildArch:           noarch
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 The header files and libraries for developing plugins for Apache Traffic Server
@@ -131,7 +132,10 @@ hadling ESI requests to providing a different caching algorithm.
 
 %package perl
 Summary: Perl bindings for Apache Traffic Server management
+BuildArch:           noarch
+BuildRequires:       perl-generators
 Requires: %{name} = %{version}-%{release}
+Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description perl
 A collection of Perl interfaces to manage Apache Traffic Server
@@ -211,8 +215,8 @@ rm -f %{buildroot}/usr/lib/debug%{_libdir}/%{name}/plugin_*.debug
 %endif
 
 # Why is the Perl stuff ending up in the wrong place ??
-mkdir -p %{buildroot}%{_datadir}/perl5
-mv %{buildroot}/usr/lib/perl5/Apache %{buildroot}%{_datadir}/perl5
+mkdir -p %{buildroot}%{perl_vendorlib}
+mv %{buildroot}/usr/lib/perl5/Apache %{buildroot}%{perl_vendorlib}
 rm -rf %{buildroot}/usr/lib/perl5
 
 install -D -m 0644 -p %{buildroot}%{_libdir}/%{name}/pkgconfig/%{name}.pc %{buildroot}%{_libdir}/pkgconfig/%{name}.pc
@@ -262,9 +266,9 @@ fi
 
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 
-%config(noreplace) %{_unitdir}/%{name}.service
-%config(noreplace) %{_sysusersdir}/%{name}.conf
-%config(noreplace) %{_tmpfilesdir}/%{name}.conf
+%{_unitdir}/%{name}.service
+%{_sysusersdir}/%{name}.conf
+%{_tmpfilesdir}/%{name}.conf
 
 %{_bindir}/traffic_cache_tool
 %{_bindir}/traffic_crashlog
@@ -298,22 +302,24 @@ fi
 %{_mandir}/man3/Apache::TS.3pm.gz
 %{_mandir}/man3/Apache::TS::AdminClient.3pm.gz
 %{_mandir}/man3/Apache::TS::Config::Records.3pm.gz
-%{_datadir}/perl5/Apache/TS.pm
-%{_datadir}/perl5/Apache/TS/AdminClient.pm
-%{_datadir}/perl5/Apache/TS/Config.pm
-%{_datadir}/perl5/Apache/TS/Config/Records.pm
+%dir %{perl_vendorlib}/Apache
+%{perl_vendorlib}/Apache/*
 
 
 %files devel
 %{_bindir}/tsxs
 %{_includedir}/ts
+%dir %{_includedir}/tscpp
 %{_includedir}/tscpp/api
 %{_includedir}/tscpp/util/
 %{_libdir}/pkgconfig/%{name}.pc
 
 
 %changelog
-* Thu May 5 2022 Jered Floyd <jered@redhat.com> 9.1.2-5
+* Thu May 12 2022 Jered Floyd <jered@redhat.com> 9.1.2-6
+- Further changes based on package review; perl dependencies, paths
+
+  * Thu May 5 2022 Jered Floyd <jered@redhat.com> 9.1.2-5
 - Changes based on spec review; change "RedHat" capitalization,
   and add link to upstream file layout discussion
 
