@@ -4,7 +4,7 @@
 
 Name:           trafficserver
 Version:        9.1.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Fast, scalable and extensible HTTP/1.1 and HTTP/2 caching proxy server
 
 License:        ASL 2.0
@@ -317,6 +317,9 @@ fi
 
 
 %changelog
+* Tue Jun 07 2022 Jered Floyd <jered@redhat.com> 9.1.2-7
+- Exclude s390x architecture -- not supported upstream
+
 * Thu May 12 2022 Jered Floyd <jered@redhat.com> 9.1.2-6
 - Further changes based on package review; perl dependencies, paths
 
