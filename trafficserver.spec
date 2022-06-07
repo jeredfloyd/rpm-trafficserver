@@ -38,7 +38,8 @@ Patch4:         config-layout-redhat.patch
 
 # Upstream does not support 32-bit architectures:
 # https://github.com/apache/trafficserver/issues/4432
-ExcludeArch:    %{arm} %{ix86}
+# s390x is also not a supported architecture and does not build
+ExcludeArch:    %{arm} %{ix86} s390x
 
 BuildRequires:  expat-devel hwloc-devel pcre-devel zlib-devel xz-devel
 BuildRequires:  libcurl-devel ncurses-devel gnupg python3
