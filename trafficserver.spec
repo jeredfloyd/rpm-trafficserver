@@ -122,10 +122,10 @@ Trafficserver SELinux policy module
 %package devel
 Summary: Development files for Apache Traffic Server plugins
 BuildArch:           noarch
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 
 %description devel
-The header files and libraries for developing plugins for Apache Traffic Server
+The header files for developing plugins for Apache Traffic Server
 
 Apache Traffic Server plugins can do anything from modifying HTTP headers to
 hadling ESI requests to providing a different caching algorithm. 
