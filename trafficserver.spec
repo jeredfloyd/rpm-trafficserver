@@ -4,7 +4,7 @@
 
 Name:           trafficserver
 Version:        9.1.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Fast, scalable and extensible HTTP/1.1 and HTTP/2 caching proxy server
 
 License:        ASL 2.0
@@ -35,6 +35,10 @@ Patch3:         string-index-oob.patch
 # Define standard config layout for Fedora/RHEL systems
 # Upstream PR: https://github.com/apache/trafficserver/pull/8815
 Patch4:         config-layout-redhat.patch
+# Cherry-pick OpenSSL 3 compat (needed for EL9)
+# Upstream PR: https://github.com/apache/trafficserver/pull/8837
+# Upstream PR: https://github.com/apache/trafficserver/pull/8909
+Patch5:         openssl3-hkdf.patch
 
 # Upstream does not support 32-bit architectures:
 # https://github.com/apache/trafficserver/issues/4432
@@ -44,28 +48,19 @@ ExcludeArch:    %{arm} %{ix86} s390x
 BuildRequires:  expat-devel hwloc-devel pcre-devel zlib-devel xz-devel
 BuildRequires:  libcurl-devel ncurses-devel gnupg python3
 BuildRequires:  gcc gcc-c++ perl-ExtUtils-MakeMaker
+BuildRequires:  automake libtool
 BuildRequires:  libcap-devel
 BuildRequires:  systemd-rpm-macros
-# trafficserver does not work properly with OpenSSL 3.0.2 yet
-# Upstream Issue: https://github.com/apache/trafficserver/issues/7341
-%if 0%{?fedora} >= 36
-BuildRequires:  openssl1.1-devel
-%else
 BuildRequires:  openssl-devel
-%endif
 # GCC 5 or higher is required (c++17)
 %if 0%{?rhel} && 0%{?rhel} <= 7
 BuildRequires:  devtoolset-8
 %endif
 
 Requires:       expat hwloc pcre xz ncurses pkgconfig
-%if 0%{?fedora} >= 36
-Requires:  openssl1.1
-%else
 Requires:  openssl
 # Require an OpenSSL which supports PROFILE=SYSTEM
 Conflicts:      openssl-libs < 1:1.0.1h-4
-%endif
 
 # Clean start for current Fedora/RHEL, so systemd units only
 Requires:       systemd
@@ -154,6 +149,7 @@ cp %{SOURCE3} tests/include/
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
 source /opt/rh/devtoolset-8/enable
+autoreconf
 %endif
 
 # Strange libexecdir is because upstream puts plugins in libexec, which isn't
@@ -317,6 +313,11 @@ fi
 
 
 %changelog
+* Mon Jun 13 2022 Jered Floyd <jered@redhat.com> 9.1.2-8
+- Cherry-pick OpenSSL 3 compatibility required for RHEL 9
+- Switch to OpenSSL 3 on f36+
+- Include automake in BuildRequires
+
 * Tue Jun 07 2022 Jered Floyd <jered@redhat.com> 9.1.2-7
 - Exclude s390x architecture -- not supported upstream
 
