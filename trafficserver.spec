@@ -4,7 +4,7 @@
 
 Name:           trafficserver
 Version:        9.1.2
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Fast, scalable and extensible HTTP/1.1 and HTTP/2 caching proxy server
 
 License:        ASL 2.0
@@ -25,7 +25,10 @@ Source10:       %{modulename}.fc
 
 # The new version of the test framework changes some symbols needed for the tests
 Patch0:         unit_tests.patch
+# Use Crypto Policies where supported
+%if 0%{?fedora} >= 21 || 0%{?rhel} >= 8
 Patch1:         trafficserver-crypto-policy.patch
+%endif
 # fc36 upgrades to gcc 12, which no longer has cstring compatbility in string
 # Upsteam PR: https://github.com/apache/trafficserver/pull/8786
 Patch2:         gcc12-cstring.patch
@@ -313,6 +316,9 @@ fi
 
 
 %changelog
+* Mon Jul 11 2022 Jered Floyd <jered@redhat.com> 9.1.2-9
+- Don't try to use Crypto Policies on RHEL 7
+
 * Mon Jun 13 2022 Jered Floyd <jered@redhat.com> 9.1.2-8
 - Cherry-pick OpenSSL 3 compatibility required for RHEL 9
 - Switch to OpenSSL 3 on f36+
