@@ -36,7 +36,7 @@ Patch2:         config-layout-redhat.patch
 Patch3:         openssl3-hkdf.patch
 # glibc 2.36 (Fedora 37) introduces mount.h conflict
 # Change doc: https://sourceware.org/glibc/wiki/Release/2.36#Usage_of_.3Clinux.2Fmount.h.3E_and_.3Csys.2Fmount.h.3E
-# Upstream PR: (pending)
+# Upstream PR: https://github.com/apache/trafficserver/pull/9027
 Patch4:         glibc-2.36.patch
 
 # Upstream does not support 32-bit architectures:
