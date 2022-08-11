@@ -3,8 +3,8 @@
 %global selinuxtype targeted
 
 Name:           trafficserver
-Version:        9.1.2
-Release:        9%{?dist}
+Version:        9.1.3
+Release:        1%{?dist}
 Summary:        Fast, scalable and extensible HTTP/1.1 and HTTP/2 caching proxy server
 
 License:        ASL 2.0
@@ -12,36 +12,32 @@ URL:            https://trafficserver.apache.org/
 Source0:        http://www.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
 Source1:        http://www.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2.asc
 Source2:        https://downloads.apache.org/trafficserver/KEYS
-# MINSIGSTKSZ is no longer const as of glibc 2.33, which breaks the unit test software
-# Update to the newest version of the unit test framework
-Source3:        https://github.com/catchorg/Catch2/releases/download/v2.13.8/catch.hpp
-Source4:        %{name}.service
-Source5:        %{name}.sysusers
-Source6:        %{name}.sysconf
-Source7:        %{name}.tmpfilesd
-Source8:        %{modulename}.te
-Source9:        %{modulename}.if
-Source10:       %{modulename}.fc
+Source3:        %{name}.service
+Source4:        %{name}.sysusers
+Source5:        %{name}.sysconf
+Source6:        %{name}.tmpfilesd
+Source7:        %{modulename}.te
+Source8:        %{modulename}.if
+Source9:        %{modulename}.fc
 
-# The new version of the test framework changes some symbols needed for the tests
-Patch0:         unit_tests.patch
 # Use Crypto Policies where supported
 %if 0%{?fedora} >= 21 || 0%{?rhel} >= 8
-Patch1:         trafficserver-crypto-policy.patch
+Patch0:         trafficserver-crypto-policy.patch
 %endif
-# fc36 upgrades to gcc 12, which no longer has cstring compatbility in string
-# Upsteam PR: https://github.com/apache/trafficserver/pull/8786
-Patch2:         gcc12-cstring.patch
 # Fencepost error when parsing bracketed IP address with no port; OOB string_view access
 # Upstream PR: https://github.com/apache/trafficserver/pull/8468 
-Patch3:         string-index-oob.patch
+Patch1:         string-index-oob.patch
 # Define standard config layout for Fedora/RHEL systems
 # Upstream PR: https://github.com/apache/trafficserver/pull/8815
-Patch4:         config-layout-redhat.patch
+Patch2:         config-layout-redhat.patch
 # Cherry-pick OpenSSL 3 compat (needed for EL9)
 # Upstream PR: https://github.com/apache/trafficserver/pull/8837
 # Upstream PR: https://github.com/apache/trafficserver/pull/8909
-Patch5:         openssl3-hkdf.patch
+Patch3:         openssl3-hkdf.patch
+# glibc 2.36 (Fedora 37) introduces mount.h conflict
+# Change doc: https://sourceware.org/glibc/wiki/Release/2.36#Usage_of_.3Clinux.2Fmount.h.3E_and_.3Csys.2Fmount.h.3E
+# Upstream PR: (pending)
+Patch4:         glibc-2.36.patch
 
 # Upstream does not support 32-bit architectures:
 # https://github.com/apache/trafficserver/issues/4432
@@ -145,8 +141,6 @@ installations.
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 
 %autosetup -p0
-# Replace the Catch2 testing header with the more recent version used upstream
-cp %{SOURCE3} tests/include/
 
 %build
 
@@ -169,9 +163,9 @@ autoreconf
 
 %if 0%{?with_selinux}
 mkdir selinux
+cp -p %{SOURCE7} selinux/
 cp -p %{SOURCE8} selinux/
 cp -p %{SOURCE9} selinux/
-cp -p %{SOURCE10} selinux/
 
 make -f %{_datadir}/selinux/devel/Makefile %{modulename}.pp
 bzip2 -9 %{modulename}.pp
@@ -194,10 +188,10 @@ install -D -p -m 0644 selinux/%{modulename}.if %{buildroot}%{_datadir}/selinux/d
 %endif
 
 # install systemd unit, etc.
-install -D -m 0644 -p %{SOURCE4} %{buildroot}%{_unitdir}/%{name}.service
-install -D -m 0644 -p %{SOURCE5} %{buildroot}%{_sysusersdir}/%{name}.conf
-install -D -m 0644 -p %{SOURCE6} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
-install -D -m 0644 %{SOURCE7} %{buildroot}%{_tmpfilesdir}/%{name}.conf
+install -D -m 0644 -p %{SOURCE3} %{buildroot}%{_unitdir}/%{name}.service
+install -D -m 0644 -p %{SOURCE4} %{buildroot}%{_sysusersdir}/%{name}.conf
+install -D -m 0644 -p %{SOURCE5} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+install -D -m 0644 %{SOURCE6} %{buildroot}%{_tmpfilesdir}/%{name}.conf
 install -d -m 0755 %{buildroot}/run/%{name}/
 
 # Discard the init.d script
@@ -223,7 +217,7 @@ install -D -m 0644 -p %{buildroot}%{_libdir}/%{name}/pkgconfig/%{name}.pc %{buil
 rm -rf %{buildroot}%{_libdir}/%{name}/pkgconfig
 
 %pre
-%sysusers_create_compat %{SOURCE5}
+%sysusers_create_compat %{SOURCE4}
 
 %post
 %?ldconfig
@@ -316,6 +310,11 @@ fi
 
 
 %changelog
+* Thu Aug 11 2022 Jered Floyd <jered@redhat.com> 9.1.3-1
+- Update to 9.1.3, resolves CVE-2022-25763, CVE-2022-31779, CVE-2021-37150,
+  CVE-2022-28129, CVE-2022-31780
+- Resolve glibc 2.36 (f37) header incompatibility that caused FTBFS RHBZ#2112282
+
 * Mon Jul 11 2022 Jered Floyd <jered@redhat.com> 9.1.2-9
 - Don't try to use Crypto Policies on RHEL 7
 
