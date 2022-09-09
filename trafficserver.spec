@@ -4,7 +4,7 @@
 
 Name:           trafficserver
 Version:        9.1.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Fast, scalable and extensible HTTP/1.1 and HTTP/2 caching proxy server
 
 License:        ASL 2.0
@@ -44,7 +44,7 @@ Patch4:         glibc-2.36.patch
 # s390x is also not a supported architecture and does not build
 ExcludeArch:    %{arm} %{ix86} s390x
 
-BuildRequires:  expat-devel hwloc-devel pcre-devel zlib-devel xz-devel
+BuildRequires:  expat-devel hwloc-devel pcre-devel zlib-devel xz-devel brotli-devel
 BuildRequires:  libcurl-devel ncurses-devel gnupg python3
 BuildRequires:  gcc gcc-c++ perl-ExtUtils-MakeMaker
 BuildRequires:  automake libtool
@@ -56,8 +56,8 @@ BuildRequires:  openssl-devel
 BuildRequires:  devtoolset-8
 %endif
 
-Requires:       expat hwloc pcre xz ncurses pkgconfig
-Requires:  openssl
+Requires:       expat hwloc pcre xz ncurses pkgconfig libbrotli
+Requires:       openssl
 # Require an OpenSSL which supports PROFILE=SYSTEM
 Conflicts:      openssl-libs < 1:1.0.1h-4
 
@@ -310,6 +310,9 @@ fi
 
 
 %changelog
+* Fri Sep 9 2022 Jered Floyd <jered@redhat.com> 9.1.3-2
+- Update dependencies to enable brotli compression (RHBZ#2125520)
+
 * Thu Aug 11 2022 Jered Floyd <jered@redhat.com> 9.1.3-1
 - Update to 9.1.3, resolves CVE-2022-25763, CVE-2022-31779, CVE-2021-37150,
   CVE-2022-28129, CVE-2022-31780
