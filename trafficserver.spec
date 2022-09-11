@@ -4,7 +4,7 @@
 
 Name:           trafficserver
 Version:        9.1.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Fast, scalable and extensible HTTP/1.1 and HTTP/2 caching proxy server
 
 License:        ASL 2.0
@@ -56,7 +56,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  devtoolset-8
 %endif
 
-Requires:       expat hwloc pcre xz ncurses pkgconfig libbrotli
+Requires:       expat hwloc pcre xz ncurses pkgconfig
 Requires:       openssl
 # Require an OpenSSL which supports PROFILE=SYSTEM
 Conflicts:      openssl-libs < 1:1.0.1h-4
@@ -310,6 +310,9 @@ fi
 
 
 %changelog
+* Sun Sep 11 2022 Jered Floyd <jered@redhat.com> 9.1.3-2
+- FTI on EL8 due to lack of libbrotli pkg; use RPM autodeps instead
+
 * Fri Sep 9 2022 Jered Floyd <jered@redhat.com> 9.1.3-2
 - Update dependencies to enable brotli compression (RHBZ#2125520)
 
